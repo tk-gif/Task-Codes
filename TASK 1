@@ -14,7 +14,7 @@ from datetime import datetimeS
 
 #   Setting up API and City Details
 
-API_KEY = "503f2cf432a7a41950e24a15168ac991"
+API_KEY = "Your API key"
 CITY = "Mumbai"
 URL = f"https://api.openweathermap.org/data/2.5/forecast?q={CITY}&appid={API_KEY}&units=metric"
 
