@@ -1,0 +1,31 @@
+
+
+### **🔹 Task 1: API Integration and Data Visualization**
+
+* **What to do:** Write a Python script that fetches data from a public API (like OpenWeatherMap).
+* **Then:** Use libraries like **Matplotlib** or **Seaborn** to create visual graphs from the data.
+* **Deliverable:** One script file + one visualization (like a chart or dashboard).
+
+---
+
+### **🔹 Task 2: Automated Report Generation**
+
+* **What to do:** Create a Python script that reads data from a file (like CSV), analyzes it (e.g., finds averages or summaries), and generates a **PDF report**.
+* **Use:** Libraries such as **FPDF** or **ReportLab**.
+* **Deliverable:** The Python script + one example PDF report.
+
+---
+
+### **🔹 Task 3: AI Chatbot with NLP**
+
+* **What to do:** Build a chatbot using **Natural Language Processing (NLP)** with libraries like **NLTK** or **spaCy**.
+* **Functionality:** The bot should be able to understand and respond to basic user questions.
+* **Deliverable:** A working chatbot implemented in Python.
+
+---
+
+### **🔹 Task 4: Machine Learning Model Implementation**
+
+* **What to do:** Use **Scikit-learn** to build a machine learning model that can classify or predict outcomes.
+* **Example:** A spam email detector.
+* **Deliverable:** A **Jupyter Notebook** that shows your code, the model training, and the results.
