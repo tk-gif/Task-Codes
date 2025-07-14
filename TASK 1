@@ -1,0 +1,121 @@
+#Task 1
+import requests
+import matplotlib.pyplot as plt
+import pandas as pd
+from datetime import datetimeS
+
+'''
+1.Requests library is used for HTTP request for the API
+2.Matplotlib is used for data visualization
+3.Panda is used to organize and manipulate data in a tabular format.
+4.Datetime handles and format date and time data.
+
+'''
+
+#   Setting up API and City Details
+
+API_KEY = "503f2cf432a7a41950e24a15168ac991"
+CITY = "Mumbai"
+URL = f"https://api.openweathermap.org/data/2.5/forecast?q={CITY}&appid={API_KEY}&units=metric"
+
+'''
+1. The API key is provided by the openweather website
+2. secind we can choose any city here it is mumbai
+3. This URL is the API endpoint used to fetch weather forecast data from OpenWeatherMap
+'''
+
+# 2  Fetching the Weather Data
+response = requests.get(URL)
+' this helps to fetch the information for the http using the API'
+
+if response.status_code != 200:
+    print(f"Error: {response.status_code} - {response.text}")
+    exit()
+'''response.status_code bassically tells that the request was successful
+in this case 200 means successful.
+'''
+
+data = response.json()
+'''helps convert into JSON response converting it into a python library
+ which helps python to read the API better'''
+
+
+# 3 Extracting and Organizing Data
+dates = []
+temperatures = []
+humidities = []
+rain_flags = []
+
+''' these are variables used to store the values that
+will be extracted.  '''
+
+for entry in data['list']:
+    dt = datetime.strptime(entry['dt_txt'], "%Y-%m-%d %H:%M:%S")
+    temp = entry['main']['temp']
+    humidity = entry['main']['humidity']
+
+''' the open weather app gives the a list of wheater data in every 3 hours
+which means for each 3-hour entry in the list.'''
+
+    # 4 Check if rain is mentioned in weather condition
+weather_condition = entry['weather'][0]['main']
+rain = "Yes" if ("rain" in entry or weather_condition.lower() == "rain") else "No"
+
+'''1. chain of lookups in a nested data structure, gives the info of. gives the main wheater condition
+like Rain, clear, clouds(the main wheater conditions).
+
+2. Check if it's going to rain.If the data says rain anywhere, or if the main weather condition is 'Rain',
+then write 'Yes'.Otherwise, write 'No'''
+
+dates.append(dt)
+temperatures.append(temp)
+humidities.append(humidity)
+rain_flags.append(rain)
+'this mean that the values that are being collected are added above into their respected lists.'
+
+#  Create DataFrame
+df = pd.DataFrame({
+    "DateTime": dates,
+    "Temperature (°C)": temperatures,
+    "Humidity (%)": humidities,
+    "Rain Expected": rain_flags
+})
+'''creating a table (called a DataFrame) using the Pandas library.
+the values are added then and the last one is to look out for any rain info.'''
+
+
+plt.figure(figsize=(14, 6))
+
+# Plot temperature
+plt.plot(df['DateTime'], df['Temperature (°C)'], label="Temperature (°C)", color='teal', marker='o', linestyle='--')
+
+'tells what to plot and how to plot it'
+
+# Plot humidity on same plot but secondary y-axis
+plt.plot(df['DateTime'], df['Humidity (%)'], label="Humidity (%)", color='orange', marker='x', linestyle='-.')
+
+# Highlight rain times
+for i, (dt, rain) in enumerate(zip(df["DateTime"], df["Rain Expected"])):
+    if rain == "Yes":
+        plt.axvline(x=dt, color='skyblue', linestyle=':', alpha=0.5)
+        plt.text(dt, max(df['Temperature (°C)']) + 2, 'Rain', rotation=90, color='blue', fontsize=8, ha='center')
+
+# Format the chart
+plt.title(f"5-Day Weather Forecast for {CITY}", fontsize=14)
+plt.xlabel("Date & Time", fontsize=12)
+plt.ylabel("Temperature / Humidity", fontsize=12)
+plt.xticks(rotation=45)
+plt.grid(True)
+plt.legend()
+plt.tight_layout()
+plt.show()
+
+df.to_csv(f"{CITY}_5_day_detailed_forecast.csv", index=False)
+print(f"Forecast saved to {CITY}_5_day_detailed_forecast.csv")
+
+'''df is your forecast table (a DataFrame).
+to_csv() tells Python to save it as a CSV file (like a spreadsheet).
+f"{CITY}_5_day_detailed_forecast.csv" creates a file name using the city name'''
+
+print("\n🔍 Upcoming Rain Forecast:")
+print(df[df["Rain Expected"] == "Yes"][["DateTime", "Temperature (°C)", "Humidity (%)"]])
