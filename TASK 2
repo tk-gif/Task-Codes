@@ -1,0 +1,127 @@
+#TASK -2
+!pip install fpdf
+from fpdf import FPDF
+'FPDF helps convert files into PDF'
+from statistics import mean
+from datetime import datetime
+import csv
+from collections import defaultdict
+'provides extra types of data structures that are not in the basic dict, list, etc.'
+
+# type out the wanted info in notepad and import it here
+with open('data.csv', 'w') as file:
+    file.write('Name,Subject,Score,Remarks\n')
+    file.write('Alice,Math,85,Good understanding\n')
+    file.write('Bob,Math,78,Needs improvement\n')
+    file.write('Charlie,Science,92,Excellent\n')
+    file.write('Diana,Science,88,Very good\n')
+    file.write('Evan,Math,75,Try harder\n')
+    file.write('Frank,English,81,Fair\n')
+    file.write('Grace,English,90,Very good\n')
+    file.write('Helen,Math,69,Weak in basics\n')
+    file.write('Ian,Science,95,Outstanding\n')
+    file.write('Jack,English,72,Can do better\n')
+'''
+This opens (or creates) a file named data.csv in write mode ('w').with is used to handle file operations safely.
+file is the file object used to write data into the file. the  first file line of code gives the header and the other gives the names
+and the grades and other info.
+'''
+
+#  Read data from the CSV
+data = []
+'creating an empty list named data.'
+subjects = defaultdict(list)
+'Create a dictionary named subjects'
+
+with open('data.csv', 'r') as file:
+    reader = csv.DictReader(file) #Reads the CSV file line by line, converting each row into a dictionary
+    for row in reader:
+        score = int(row['Score']) # convert score from string to integer
+        row['Score'] = score  # update the 'Score' value to an integer
+        data.append(row)  # store this row (dictionary) in the data list
+        subjects[row['Subject']].append(score) # group score by subject
+
+# Analysing
+total_students = len(data)
+overall_avg = mean([d['Score'] for d in data])
+top_score = max([d['Score'] for d in data])
+top_students = [d['Name'] for d in data if d['Score'] == top_score]
+''
+
+# Generation of the  PDF Report
+class PDF(FPDF):
+    def header(self):
+        self.set_font("Arial", "B", 16)
+        self.cell(0, 10, "Student Performance Report", ln=True, align="C")
+
+    def footer(self):
+        self.set_y(-15)
+        self.set_font("Arial", "I", 8)
+        self.cell(0, 10, f"Page {self.page_no()}", align="C")
+
+pdf = PDF()
+pdf.set_auto_page_break(auto=True, margin=15)
+
+# 🧾 Cover Page
+pdf.add_page()
+pdf.set_font("Arial", "B", 20)
+pdf.ln(60)
+pdf.cell(0, 10, "Student Performance Report", ln=True, align="C")
+pdf.set_font("Arial", "", 14)
+pdf.ln(10)
+pdf.cell(0, 10, f"Generated on: {datetime.now().strftime('%B %d, %Y')}", ln=True, align="C")
+
+# 📊 Summary Page
+pdf.add_page()
+pdf.set_font("Arial", "B", 16)
+pdf.cell(0, 10, "Summary of Results", ln=True)
+
+pdf.set_font("Arial", "", 12)
+pdf.ln(10)
+pdf.cell(0, 10, f"Total Students: {total_students}", ln=True)
+pdf.cell(0, 10, f"Overall Average Score: {overall_avg:.2f}", ln=True)
+pdf.cell(0, 10, f"Top Score: {top_score} ({', '.join(top_students)})", ln=True)
+
+pdf.ln(10)
+pdf.set_font("Arial", "B", 14)
+pdf.cell(0, 10, "Subject-wise Averages:", ln=True)
+
+pdf.set_font("Arial", "", 12)
+for subject, scores in subjects.items():
+    pdf.cell(0, 10, f"{subject}: {mean(scores):.2f}", ln=True)
+
+# 📋 Detailed Student Scores
+pdf.add_page()
+pdf.set_font("Arial", "B", 14)
+pdf.cell(0, 10, "Detailed Student Scores", ln=True)
+
+# Table headers
+pdf.set_font("Arial", "B", 12)
+pdf.cell(50, 10, "Name", border=1)
+pdf.cell(40, 10, "Subject", border=1)
+pdf.cell(25, 10, "Score", border=1)
+pdf.cell(75, 10, "Remarks", border=1, ln=True)
+
+# Table content
+for entry in data:
+    name = entry['Name']
+    subject = entry['Subject']
+    score = entry['Score']
+    remarks = entry['Remarks']
+
+    if score >= 90:
+        pdf.set_text_color(0, 100, 255)  # Blue
+        pdf.set_font("Arial", "B", 12)
+    else:
+        pdf.set_text_color(0, 0, 0)  # Black
+        pdf.set_font("Arial", "", 12)
+
+    pdf.cell(50, 10, name, border=1)
+    pdf.cell(40, 10, subject, border=1)
+    pdf.cell(25, 10, str(score), border=1)
+    pdf.cell(75, 10, remarks, border=1, ln=True)
+
+# ✅ Output PDF
+pdf.output("report.pdf")
+
+print("PDF report generated successfully as 'report.pdf'")
