@@ -1,38 +1,30 @@
-# 📦 Step 1: Import required libraries
 import pandas as pd
 from sklearn.model_selection import train_test_split
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.naive_bayes import MultinomialNB
 from sklearn.metrics import accuracy_score, classification_report
 
-# 📥 Step 2: Load your uploaded CSV file
 # Make sure you uploaded `spam_data.csv` in the left-side panel
 data = pd.read_csv("spam_data.csv")
 print("🔍 Sample Data:")
 print(data.head())
 
-# 🔁 Step 3: Prepare the features (X) and labels (y)
 X = data['message']
 y = data['label']
 
-# 🔤 Step 4: Convert text to numeric using Bag of Words (CountVectorizer)
 vectorizer = CountVectorizer()
 X_vectorized = vectorizer.fit_transform(X)
 
-# 🔀 Step 5: Split into training and testing sets
 X_train, X_test, y_train, y_test = train_test_split(X_vectorized, y, test_size=0.2, random_state=42)
 
-# 🧠 Step 6: Train the Naive Bayes model
 model = MultinomialNB()
 model.fit(X_train, y_train)
 
-# 📈 Step 7: Predict and evaluate the model
 y_pred = model.predict(X_test)
 print("\n📊 Model Evaluation:")
 print("Accuracy:", accuracy_score(y_test, y_pred))
 print(classification_report(y_test, y_pred))
 
-# ✉️ Step 8: Try predicting on new email messages
 sample_emails = [
     "You’ve won a free cruise to the Bahamas! Call now!",
     "Hi, just wanted to check in about tomorrow’s meeting."
@@ -40,7 +32,6 @@ sample_emails = [
 sample_vec = vectorizer.transform(sample_emails)
 predictions = model.predict(sample_vec)
 
-# 💬 Step 9: Output the predictions
 print("\n🔍 Predictions for new messages:")
 for email, label in zip(sample_emails, predictions):
     print(f"Email: {email}\nPrediction: {label}\n")
